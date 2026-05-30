@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وقتي - كل قرش بيساوي وقت</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C; --gold-light: #E8C97A; --gold-dark: #A07830;
+  --dark: #0D0D0D; --dark2: #161616; --dark3: #1E1E1E; --dark4: #252525;
+  --text: #F0EAD6; --text-muted: #9A9080;
+  --red: #E05252; --green: #52C896; --blue: #5299E0; --orange: #E09452;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Cairo',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; overflow-x:hidden; }
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background: radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.07) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.05) 0%, transparent 50%);
+}
+.app { max-width:430px; margin:0 auto; min-height:100vh; position:relative; z-index:1; display:flex; flex-direction:column; }
+
+/* SCREENS */
+.screen { display:none; flex-direction:column; min-height:100vh; animation:fadeIn 0.4s ease; padding-bottom:100px; }
+.screen.active { display:flex; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+/* ======= SETUP ======= */
+#setup-screen { justify-content:center; align-items:center; padding:32px 24px; text-align:center; padding-bottom:40px; }
+.logo-icon {
+  width:84px; height:84px; margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light));
+  border-radius:26px; display:flex; align-items:center; justify-content:center;
+  font-size:38px; box-shadow:0 8px 32px rgba(201,168,76,0.35); animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 8px 32px rgba(201,168,76,0.35)} 50%{box-shadow:0 8px 52px rgba(201,168,76,0.55)} }
+.logo-title { font-family:'Tajawal',sans-serif; font-size:44px; font-weight:900; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.logo-sub { font-size:14px; color:var(--text-muted); margin-top:6px; }
+.logo-area { margin-bottom:40px; }
+.setup-card { width:100%; background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:24px; padding:28px 22px; margin-bottom:20px; }
+.setup-label { font-size:13px; color:var(--text-muted); margin-bottom:8px; text-align:right; }
+.setup-input { width:100%; background:var(--dark4); border:1.5px solid rgba(201,168,76,0.2); border-radius:14px; padding:15px 18px; font-family:'Cairo',sans-serif; font-size:22px; font-weight:700; color:var(--text); text-align:center; outline:none; transition:all 0.3s; direction:ltr; }
+.setup-input:focus { border-color:var(--gold); background:rgba(201,168,76,0.05); box-shadow:0 0 0 4px rgba(201,168,76,0.1); }
+.setup-input::placeholder { color:var(--text-muted); font-size:15px; }
+.hours-select { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+.hour-btn { background:var(--dark4); border:1.5px solid rgba(201,168,76,0.15); border-radius:12px; padding:10px; color:var(--text-muted); font-family:'Cairo',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+.hour-btn:hover { border-color:var(--gold); color:var(--gold); }
+.hour-btn.selected { background:rgba(201,168,76,0.15); border-color:var(--gold); color:var(--gold); font-weight:700; }
+.rate-display { margin-top:18px; padding:14px; background:rgba(201,168,76,0.08); border-radius:14px; border:1px solid rgba(201,168,76,0.2); text-align:center; }
+.rate-label { font-size:12px; color:var(--text-muted); }
+.rate-value { font-size:30px; font-weight:900; color:var(--gold); margin:4px 0; }
+.rate-unit { font-size:13px; color:var(--text-muted); }
+.btn-primary { width:100%; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border:none; border-radius:16px; padding:18px; font-family:'Cairo',sans-serif; font-size:16px; font-weight:700; color:var(--dark); cursor:pointer; transition:all 0.3s; box-shadow:0 4px 20px rgba(201,168,76,0.3); }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(201,168,76,0.45); }
+.btn-primary:active { transform:translateY(0); }
+
+/* ======= TOP BAR ======= */
+.top-bar { padding:20px 24px 0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.top-title { font-family:'Tajawal',sans-serif; font-size:26px; font-weight:900; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.top-right { display:flex; gap:8px; }
+.icon-btn { width:40px; height:40px; background:var(--dark3); border:1px solid rgba(201,168,76,0.2); border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:all 0.2s; }
+.icon-btn:hover { border-color:var(--gold); transform:scale(1.05); }
+
+/* ======= ZIKR BANNER ======= */
+.zikr-banner { margin:14px 24px 0; padding:11px 18px; background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.06)); border:1px solid rgba(201,168,76,0.25); border-radius:14px; text-align:center; position:relative; overflow:hidden; }
+.zikr-banner::before { content:''; position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(201,168,76,0.1),transparent); animation:shimmer 4s ease-in-out infinite; }
+@keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
+.zikr-text { font-family:'Tajawal',sans-serif; font-size:14px; font-weight:700; color:var(--gold-light); position:relative; z-index:1; }
+
+/* ======= BUDGET ALERT ======= */
+.budget-alert { margin:10px 24px 0; padding:12px 16px; border-radius:14px; display:none; align-items:center; gap:10px; font-size:13px; font-weight:600; }
+.budget-alert.warn { background:rgba(224,148,82,0.15); border:1px solid rgba(224,148,82,0.3); color:var(--orange); display:flex; }
+.budget-alert.danger { background:rgba(224,82,82,0.15); border:1px solid rgba(224,82,82,0.3); color:var(--red); display:flex; }
+.budget-alert.safe { background:rgba(82,200,150,0.1); border:1px solid rgba(82,200,150,0.25); color:var(--green); display:flex; }
+
+/* ======= SUMMARY CARD ======= */
+.summary-card { margin:14px 24px 0; background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:22px; padding:22px; }
+.summary-title { font-size:12px; color:var(--text-muted); margin-bottom:10px; }
+.summary-main { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+.summary-hours { font-family:'Tajawal',sans-serif; font-size:50px; font-weight:900; color:var(--gold); line-height:1; }
+.summary-unit { font-size:16px; color:var(--text-muted); }
+.summary-money { font-size:14px; color:var(--text-muted); margin-bottom:16px; }
+.summary-money span { color:var(--text); font-weight:600; }
+.progress-wrap { background:var(--dark4); border-radius:8px; height:7px; overflow:hidden; }
+.progress-bar { height:100%; border-radius:8px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1),background 0.4s; width:0%; }
+.progress-bar.low { background:linear-gradient(90deg,var(--gold-dark),var(--gold)); }
+.progress-bar.mid { background:linear-gradient(90deg,var(--orange),#f0a060); }
+.progress-bar.high { background:linear-gradient(90deg,var(--red),#f07070); }
+.progress-labels { display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:var(--text-muted); }
+
+/* ======= STATS ROW ======= */
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 24px 0; }
+.stat-card { background:var(--dark3); border:1px solid rgba(255,255,255,0.04); border-radius:18px; padding:16px; }
+.stat-icon { font-size:22px; margin-bottom:6px; }
+.stat-val { font-family:'Tajawal',sans-serif; font-size:22px; font-weight:900; color:var(--text); }
+.stat-label { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+/* ======= BUDGET MINI CARD ======= */
+.budget-mini { margin:10px 24px 0; background:var(--dark3); border:1px solid rgba(255,255,255,0.05); border-radius:18px; padding:14px 18px; display:none; }
+.budget-mini.show { display:flex; align-items:center; justify-content:space-between; }
+.bm-label { font-size:12px; color:var(--text-muted); }
+.bm-remain { font-family:'Tajawal',sans-serif; font-size:20px; font-weight:900; }
+.bm-remain.ok { color:var(--green); }
+.bm-remain.low { color:var(--orange); }
+.bm-remain.over { color:var(--red); }
+.bm-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+/* ======= ADD BTN ======= */
+.add-btn-wrap { padding:14px 24px 0; }
+.add-expense-btn { width:100%; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border:none; border-radius:18px; padding:18px; display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Cairo',sans-serif; font-size:16px; font-weight:700; color:var(--dark); cursor:pointer; transition:all 0.3s; box-shadow:0 4px 20px rgba(201,168,76,0.3); }
+.add-expense-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(201,168,76,0.45); }
+.add-expense-btn:active { transform:translateY(0); }
+
+/* ======= TRANSACTIONS ======= */
+.section-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 8px; }
+.section-title { font-size:13px; font-weight:700; color:var(--text-muted); }
+.clear-btn { font-size:12px; color:var(--red); background:none; border:none; cursor:pointer; font-family:'Cairo',sans-serif; opacity:0.7; transition:opacity 0.2s; }
+.clear-btn:hover { opacity:1; }
+.transactions-list { padding:0 24px; overflow-y:auto; }
+.transaction-item { background:var(--dark3); border:1px solid rgba(255,255,255,0.04); border-radius:16px; padding:14px 16px; margin-bottom:9px; display:flex; align-items:center; gap:12px; animation:slideIn 0.3s ease; position:relative; overflow:hidden; }
+@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.transaction-item::before { content:''; position:absolute; right:0; top:0; bottom:0; width:3px; background:var(--gold); }
+.t-emoji { font-size:26px; flex-shrink:0; }
+.t-info { flex:1; min-width:0; }
+.t-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.t-time { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.t-values { text-align:left; flex-shrink:0; }
+.t-hours { font-family:'Tajawal',sans-serif; font-size:18px; font-weight:900; color:var(--gold); }
+.t-money { font-size:11px; color:var(--text-muted); }
+.t-delete { width:30px; height:30px; background:rgba(224,82,82,0.1); border:none; border-radius:8px; color:var(--red); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; flex-shrink:0; }
+.t-delete:hover { background:rgba(224,82,82,0.25); }
+.empty-state { text-align:center; padding:48px 24px; color:var(--text-muted); }
+.empty-icon { font-size:48px; margin-bottom:12px; opacity:0.5; }
+.empty-text { font-size:14px; line-height:1.7; }
+
+/* ======= MODAL ======= */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:100; align-items:flex-end; justify-content:center; backdrop-filter:blur(4px); }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--dark2); border:1px solid rgba(201,168,76,0.2); border-radius:28px 28px 0 0; padding:28px 22px 36px; width:100%; max-width:430px; animation:slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1); max-height:90vh; overflow-y:auto; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:40px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:0 auto 22px; }
+.modal-title { font-family:'Tajawal',sans-serif; font-size:22px; font-weight:900; color:var(--gold); text-align:center; margin-bottom:22px; }
+.modal-label { font-size:12px; color:var(--text-muted); margin-bottom:7px; }
+.modal-input { width:100%; background:var(--dark4); border:1.5px solid rgba(201,168,76,0.2); border-radius:14px; padding:13px 17px; font-family:'Cairo',sans-serif; font-size:16px; color:var(--text); outline:none; margin-bottom:14px; transition:all 0.3s; text-align:right; }
+.modal-input:focus { border-color:var(--gold); box-shadow:0 0 0 4px rgba(201,168,76,0.1); }
+.modal-input[type="number"] { direction:ltr; text-align:center; font-size:24px; font-weight:700; }
+.categories { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:14px; }
+.cat-btn { background:var(--dark4); border:1.5px solid rgba(255,255,255,0.06); border-radius:12px; padding:9px 4px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.cat-btn:hover { border-color:var(--gold); }
+.cat-btn.selected { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+.cat-emoji { font-size:20px; }
+.cat-name { font-size:10px; color:var(--text-muted); margin-top:3px; }
+.cat-btn.selected .cat-name { color:var(--gold); }
+.warning-box { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); border-radius:14px; padding:14px; margin-bottom:18px; text-align:center; display:none; }
+.warning-box.show { display:block; }
+.warning-hours { font-family:'Tajawal',sans-serif; font-size:30px; font-weight:900; color:var(--gold); }
+.warning-text { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.modal-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.btn-cancel { background:var(--dark4); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:15px; font-family:'Cairo',sans-serif; font-size:15px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+.btn-cancel:hover { border-color:rgba(255,255,255,0.2); color:var(--text); }
+.btn-confirm { background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border:none; border-radius:14px; padding:15px; font-family:'Cairo',sans-serif; font-size:15px; font-weight:700; color:var(--dark); cursor:pointer; transition:all 0.3s; }
+.btn-confirm:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(201,168,76,0.4); }
+
+/* ======= SETTINGS MODAL ======= */
+.settings-section { margin-bottom:20px; }
+.settings-section-title { font-size:12px; color:var(--text-muted); margin-bottom:10px; font-weight:700; letter-spacing:0.5px; }
+.settings-row { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--dark4); border-radius:14px; margin-bottom:8px; }
+.settings-row-label { font-size:14px; font-weight:600; }
+.settings-row-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.toggle { position:relative; width:46px; height:26px; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:var(--dark3); border-radius:13px; cursor:pointer; transition:0.3s; border:1px solid rgba(255,255,255,0.1); }
+.toggle-slider::before { content:''; position:absolute; height:20px; width:20px; left:2px; top:2px; background:#666; border-radius:50%; transition:0.3s; }
+.toggle input:checked + .toggle-slider { background:rgba(201,168,76,0.2); border-color:var(--gold); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(20px); background:var(--gold); }
+.danger-btn { width:100%; background:rgba(224,82,82,0.1); border:1px solid rgba(224,82,82,0.2); border-radius:14px; padding:14px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; color:var(--red); cursor:pointer; transition:all 0.2s; margin-top:8px; }
+.danger-btn:hover { background:rgba(224,82,82,0.2); }
+
+/* ======= GOAL SCREEN ======= */
+#goal-screen { padding:0 24px; }
+.screen-top { padding:20px 0 0; display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.back-btn { width:38px; height:38px; background:var(--dark3); border:1px solid rgba(201,168,76,0.2); border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold); transition:all 0.2s; flex-shrink:0; }
+.back-btn:hover { border-color:var(--gold); }
+.screen-title { font-family:'Tajawal',sans-serif; font-size:22px; font-weight:900; color:var(--gold); }
+.goal-card { background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:22px; padding:22px; margin-bottom:14px; }
+.goal-title { font-family:'Tajawal',sans-serif; font-size:18px; font-weight:900; color:var(--gold); margin-bottom:5px; }
+.goal-sub { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
+.goal-result { margin-top:18px; padding:18px; background:rgba(201,168,76,0.08); border-radius:16px; border:1px solid rgba(201,168,76,0.2); text-align:center; display:none; }
+.goal-result.show { display:block; }
+.goal-result-days { font-family:'Tajawal',sans-serif; font-size:54px; font-weight:900; color:var(--gold); line-height:1; }
+.goal-result-label { font-size:14px; color:var(--text-muted); margin-top:4px; }
+.goal-result-hours { font-size:12px; color:var(--text-muted); margin-top:8px; }
+.goal-result-hours span { color:var(--text); }
+.compare-row { display:flex; justify-content:space-between; align-items:center; padding:11px 14px; background:var(--dark4); border-radius:12px; margin-bottom:8px; }
+.compare-label { font-size:13px; color:var(--text-muted); }
+.compare-val { font-size:15px; font-weight:700; color:var(--gold); }
+.goals-list { display:flex; flex-direction:column; gap:10px; }
+.goal-item { background:var(--dark4); border:1px solid rgba(201,168,76,0.1); border-radius:16px; padding:14px 16px; }
+.goal-item-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.goal-item-name { font-size:14px; font-weight:700; }
+.goal-item-price { font-size:13px; color:var(--gold); font-weight:700; }
+.goal-item-prog { background:var(--dark3); border-radius:6px; height:5px; overflow:hidden; }
+.goal-item-bar { height:100%; background:linear-gradient(90deg,var(--gold-dark),var(--gold)); border-radius:6px; transition:width 0.6s ease; }
+.goal-item-pct { font-size:11px; color:var(--text-muted); margin-top:5px; display:flex; justify-content:space-between; }
+.goal-delete { background:none; border:none; color:var(--red); cursor:pointer; font-size:14px; opacity:0.6; }
+.goal-delete:hover { opacity:1; }
+.add-goal-btn { width:100%; background:rgba(201,168,76,0.1); border:1.5px dashed rgba(201,168,76,0.3); border-radius:16px; padding:15px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; color:var(--gold); cursor:pointer; transition:all 0.2s; margin-bottom:14px; }
+.add-goal-btn:hover { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+
+/* ======= ANALYSIS SCREEN ======= */
+#weekly-screen { padding:0 24px; }
+.chart-container { background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:22px; padding:22px; margin-bottom:14px; }
+.chart-bars { display:flex; align-items:flex-end; gap:8px; height:130px; margin:18px 0 10px; }
+.chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; gap:4px; }
+.chart-bar { width:100%; border-radius:7px 7px 0 0; transition:height 0.7s cubic-bezier(0.34,1.56,0.64,1); min-height:4px; background:linear-gradient(180deg,var(--gold),var(--gold-dark)); }
+.chart-bar:hover { filter:brightness(1.2); }
+.chart-bar-val { font-size:10px; color:var(--gold); font-weight:700; }
+.chart-bar-day { font-size:18px; }
+.insight-card { background:var(--dark3); border:1px solid rgba(255,255,255,0.05); border-radius:20px; padding:18px; margin-bottom:12px; }
+.insight-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.insight-row:last-child { border-bottom:none; }
+.insight-left { display:flex; align-items:center; gap:10px; }
+.insight-emoji { font-size:22px; }
+.insight-name { font-size:13px; font-weight:600; }
+.insight-sub { font-size:11px; color:var(--text-muted); }
+.insight-right { text-align:left; }
+.insight-hours { font-family:'Tajawal',sans-serif; font-size:17px; font-weight:900; color:var(--gold); }
+.insight-money { font-size:11px; color:var(--text-muted); }
+.total-row { display:flex; justify-content:space-between; padding:14px 0 0; font-weight:700; border-top:1px solid rgba(201,168,76,0.15); margin-top:4px; }
+.total-label { font-size:14px; }
+.total-val { font-size:14px; color:var(--gold); }
+.tip-card { background:linear-gradient(135deg,rgba(82,200,150,0.1),rgba(82,200,150,0.05)); border:1px solid rgba(82,200,150,0.2); border-radius:18px; padding:18px; margin-bottom:12px; }
+.tip-title { font-size:14px; font-weight:700; color:var(--green); margin-bottom:8px; }
+.tip-text { font-size:13px; color:var(--text-muted); line-height:1.7; }
+
+/* ======= TIPS SCREEN ======= */
+#tips-screen { padding:0 24px; }
+.tip-big-card { background:var(--dark3); border:1px solid rgba(201,168,76,0.15); border-radius:22px; padding:22px; margin-bottom:12px; }
+.tip-big-icon { font-size:36px; margin-bottom:12px; }
+.tip-big-title { font-family:'Tajawal',sans-serif; font-size:18px; font-weight:900; color:var(--gold); margin-bottom:8px; }
+.tip-big-text { font-size:14px; color:var(--text-muted); line-height:1.8; }
+.tip-tag { display:inline-block; background:rgba(201,168,76,0.15); border-radius:20px; padding:3px 12px; font-size:11px; color:var(--gold); margin-top:12px; font-weight:700; }
+
+/* ======= BOTTOM NAV ======= */
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:rgba(13,13,13,0.97); backdrop-filter:blur(20px); border-top:1px solid rgba(201,168,76,0.1); padding:10px 16px 20px; display:none; justify-content:space-around; z-index:50; }
+.bottom-nav.show { display:flex; }
+.nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; cursor:pointer; padding:8px 14px; border-radius:14px; transition:all 0.2s; color:var(--text-muted); }
+.nav-btn.active { color:var(--gold); background:rgba(201,168,76,0.1); }
+.nav-btn:hover:not(.active) { color:var(--text); }
+.nav-icon { font-size:22px; }
+.nav-label { font-size:10px; font-weight:600; }
+
+/* FOOTER */
+.footer-credit { text-align:center; padding:6px; font-size:11px; color:rgba(201,168,76,0.3); font-family:'Cairo',sans-serif; display:none; }
+.footer-credit.show { display:block; }
+
+/* TOAST */
+.toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-100px); background:var(--dark3); border:1px solid rgba(201,168,76,0.3); border-radius:14px; padding:12px 24px; font-size:13px; font-weight:600; color:var(--gold); z-index:200; transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; max-width:90vw; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* BADGE */
+.badge { display:inline-flex; align-items:center; justify-content:center; background:var(--red); color:white; font-size:10px; font-weight:900; border-radius:10px; min-width:18px; height:18px; padding:0 5px; position:absolute; top:-4px; left:-4px; }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.2); border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ========== SETUP SCREEN ========== -->
+<div id="setup-screen" class="screen active">
+  <div class="logo-area">
+    <div class="logo-icon">⏳</div>
+    <div class="logo-title">وقتـي</div>
+    <div class="logo-sub">كل قرش بيساوي وقت من عمرك</div>
+  </div>
+  <div class="setup-card">
+    <div class="setup-label">💰 مرتبك الشهري (جنيه مصري)</div>
+    <input type="number" class="setup-input" id="salary-input" placeholder="مثلاً: 8000" oninput="calcRate()" inputmode="numeric">
+    <div style="margin-top:18px;">
+      <div class="setup-label">⏰ ساعات الشغل في اليوم</div>
+      <div class="hours-select">
+        <button class="hour-btn" onclick="selectHours(4,this)">4 ساعات</button>
+        <button class="hour-btn" onclick="selectHours(6,this)">6 ساعات</button>
+        <button class="hour-btn selected" onclick="selectHours(8,this)">8 ساعات</button>
+        <button class="hour-btn" onclick="selectHours(10,this)">10 ساعات</button>
+        <button class="hour-btn" onclick="selectHours(12,this)">12 ساعة</button>
+        <button class="hour-btn" onclick="selectHours(24,this)">24 ساعة</button>
+      </div>
+    </div>
+    <div class="rate-display" id="rate-display" style="display:none">
+      <div class="rate-label">ساعة شغلك تساوي</div>
+      <div class="rate-value" id="rate-value">0</div>
+      <div class="rate-unit">جنيه / الساعة</div>
+    </div>
+  </div>
+  <div class="setup-card" style="margin-bottom:20px;">
+    <div class="setup-label">🎯 ميزانية اليوم (اختياري)</div>
+    <input type="number" class="setup-input" id="budget-input" placeholder="مثلاً: 200" inputmode="numeric">
+    <div style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center">حدد ميزانية يومية وهنعلمك لو اتجاوزتها</div>
+  </div>
+  <button class="btn-primary" onclick="startApp()">🚀 ابدأ تتابع وقتك</button>
+</div>
+
+<!-- ========== MAIN SCREEN ========== -->
+<div id="main-screen" class="screen">
+  <div class="top-bar">
+    <div class="top-title">وقتـي ⏳</div>
+    <div class="top-right">
+      <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
+    </div>
+  </div>
+
+  <div class="zikr-banner" id="zikr-main">
+    <div class="zikr-text" id="zikr-text-main">🌙 اذكر الله ذكراً كثيراً</div>
+  </div>
+
+  <div class="budget-alert" id="budget-alert">
+    <span id="budget-alert-icon">⚠️</span>
+    <span id="budget-alert-text"></span>
+  </div>
+
+  <div class="summary-card">
+    <div class="summary-title">📅 مصاريف النهارده</div>
+    <div class="summary-main">
+      <div class="summary-hours" id="today-hours">0</div>
+      <div class="summary-unit">ساعة من وقتك</div>
+    </div>
+    <div class="summary-money">= صرفت <span id="today-money">0</span> جنيه النهارده</div>
+    <div class="progress-wrap">
+      <div class="progress-bar low" id="progress-bar"></div>
+    </div>
+    <div class="progress-labels">
+      <span id="progress-pct">0% من يوم شغلك</span>
+      <span id="work-hours-label">من 8 ساعات</span>
+    </div>
+  </div>
+
+  <div class="budget-mini" id="budget-mini">
+    <div>
+      <div class="bm-label">الميزانية اليومية</div>
+      <div class="bm-remain ok" id="bm-remain">0 ج</div>
+      <div class="bm-sub" id="bm-sub">متبقي</div>
+    </div>
+    <div style="text-align:left">
+      <div style="font-size:11px;color:var(--text-muted)">من</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text)" id="bm-budget">0 ج</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-val" id="total-items">0</div>
+      <div class="stat-label">عملية مسجّلة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💸</div>
+      <div class="stat-val" id="total-money">0</div>
+      <div class="stat-label">إجمالي الصرف (ج)</div>
+    </div>
+  </div>
+
+  <div class="add-btn-wrap">
+    <button class="add-expense-btn" onclick="openModal()">
+      <span style="font-size:22px;font-weight:900">+</span>
+      <span>سجّل مصروف جديد</span>
+    </button>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">⚡ آخر المصاريف</div>
+    <button class="clear-btn" onclick="clearAll()">مسح الكل</button>
+  </div>
+
+  <div class="transactions-list" id="transactions-list">
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <div class="empty-text">لسه مفيش مصاريف مسجّلة<br>ابدأ سجّل أول مصروف!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GOAL SCREEN ========== -->
+<div id="goal-screen" class="screen">
+  <div class="screen-top">
+    <button class="back-btn" onclick="showScreen('main')">←</button>
+    <div class="screen-title">🎯 أهدافي</div>
+  </div>
+
+  <div class="zikr-banner" style="margin:0 0 16px;">
+    <div class="zikr-text">✨ سبحان الله • الحمد لله • لا إله إلا الله • الله أكبر</div>
+  </div>
+
+  <div class="goal-card">
+    <div class="goal-title">احسب هدفك</div>
+    <div class="goal-sub">عايز تشتري حاجة؟ اعرف هتشتغل كام يوم عشانها</div>
+    <div class="modal-label">اسم الحاجة</div>
+    <input type="text" class="modal-input" id="goal-name" placeholder="مثلاً: آيفون جديد">
+    <div class="modal-label">سعرها بالجنيه</div>
+    <input type="number" class="modal-input" id="goal-price" placeholder="0" oninput="calcGoal()" inputmode="numeric">
+    <div class="goal-result" id="goal-result">
+      <div class="goal-result-days" id="goal-days">0</div>
+      <div class="goal-result-label" id="goal-label">يوم شغل</div>
+      <div class="goal-result-hours">= <span id="goal-hours-val">0</span> ساعة من وقتك</div>
+    </div>
+    <div id="goal-comparisons" style="margin-top:14px;"></div>
+    <button class="add-goal-btn" style="margin-top:14px;margin-bottom:0;" onclick="saveGoal()">＋ حفظ الهدف ده</button>
+  </div>
+
+  <div class="goal-card">
+    <div class="goal-title">📋 أهدافي المحفوظة</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">تابع وفّرت إيه عشان كل هدف</div>
+    <div class="goals-list" id="goals-list">
+      <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">لسه مفيش أهداف محفوظة</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ANALYSIS SCREEN ========== -->
+<div id="weekly-screen" class="screen">
+  <div class="screen-top">
+    <button class="back-btn" onclick="showScreen('main')">←</button>
+    <div class="screen-title">📊 تحليل مصاريفك</div>
+  </div>
+
+  <div class="zikr-banner" style="margin:0 0 16px;">
+    <div class="zikr-text">💫 اللهم بارك لنا في أوقاتنا وأرزاقنا</div>
+  </div>
+
+  <div class="chart-container">
+    <div class="goal-title">توزيع الصرف حسب الفئة</div>
+    <div class="chart-bars" id="chart-bars">
+      <div style="color:var(--text-muted);font-size:13px;margin:auto;">لسه مفيش بيانات</div>
+    </div>
+  </div>
+
+  <div class="insight-card" id="insight-card">
+    <div class="goal-title" style="margin-bottom:14px;">تفاصيل الفئات</div>
+    <div id="insight-rows"><div style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">سجّل مصاريف عشان تشوف التحليل</div></div>
+  </div>
+
+  <div class="tip-card" id="smart-tip" style="display:none">
+    <div class="tip-title">💡 نصيحة ذكية</div>
+    <div class="tip-text" id="smart-tip-text"></div>
+  </div>
+</div>
+
+<!-- ========== TIPS SCREEN ========== -->
+<div id="tips-screen" class="screen">
+  <div class="screen-top">
+    <button class="back-btn" onclick="showScreen('main')">←</button>
+    <div class="screen-title">💡 نصايح المال</div>
+  </div>
+
+  <div class="zikr-banner" style="margin:0 0 16px;">
+    <div class="zikr-text">🤲 اللهم اجعلنا من الشاكرين على نعمة الرزق</div>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">⚖️</div>
+    <div class="tip-big-title">قاعدة 50/30/20</div>
+    <div class="tip-big-text">50% من مرتبك للاحتياجات الأساسية (أكل، إيجار، فواتير)، 30% للكماليات والترفيه، 20% للادخار والاستثمار. ابدأ بالـ20% الادخار أول ما المرتب يجي.</div>
+    <span class="tip-tag">💰 ادخار</span>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">🛒</div>
+    <div class="tip-big-title">قاعدة الـ24 ساعة</div>
+    <div class="tip-big-text">أي حاجة مش ضرورية سعرها أكتر من 200 جنيه — استنى 24 ساعة قبل ما تشتريها. 80% من الوقت هتلاقي إنك مش محتاجها.</div>
+    <span class="tip-tag">🛍️ شراء ذكي</span>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">☕</div>
+    <div class="tip-big-title">تأثير القهوة اليومية</div>
+    <div class="tip-big-text">لو بتشرب قهوة بـ50 جنيه كل يوم، ده 1500 جنيه في الشهر، 18,000 جنيه في السنة! مش لازم تبطل، بس خلّي عندك وعي بيها.</div>
+    <span class="tip-tag">☕ وعي بالعادات</span>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">📱</div>
+    <div class="tip-big-title">عدو الادخار الخفي</div>
+    <div class="tip-big-text">الاشتراكات الشهرية (نتفليكس، موسيقى، تطبيقات) بتتراكم بسرعة. اعمل قائمة بكل اشتراكاتك وشيل اللي مش بتستخدمه فعلاً.</div>
+    <span class="tip-tag">📋 مراجعة دورية</span>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">🎯</div>
+    <div class="tip-big-title">الهدف بيخلي الادخار أسهل</div>
+    <div class="tip-big-text">لما يبقى عندك هدف واضح (سفرة، موبايل، شقة)، هيبقى أسهل بكتير تقاوم الصرف الزيادة. استخدم شاشة الأهداف في التطبيق واتابع تقدمك.</div>
+    <span class="tip-tag">🎯 تخطيط</span>
+  </div>
+
+  <div class="tip-big-card">
+    <div class="tip-big-icon">🕌</div>
+    <div class="tip-big-title">بركة المال في الإسلام</div>
+    <div class="tip-big-text">قال النبي ﷺ: "ما نقصت صدقة من مال". الصدقة مش بس واجب، هي استثمار حقيقي. خصص نسبة ولو صغيرة من مرتبك للصدقة وشوف البركة بنفسك.</div>
+    <span class="tip-tag">🤲 روحاني</span>
+  </div>
+</div>
+
+<!-- ========== BOTTOM NAV ========== -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="nav-btn active" id="nav-main" onclick="showScreen('main')">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">الرئيسية</span>
+  </button>
+  <button class="nav-btn" id="nav-goal" onclick="showScreen('goal')">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">أهدافي</span>
+  </button>
+  <button class="nav-btn" id="nav-weekly" onclick="showScreen('weekly')">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">تحليل</span>
+  </button>
+  <button class="nav-btn" id="nav-tips" onclick="showScreen('tips')">
+    <span class="nav-icon">💡</span>
+    <span class="nav-label">نصايح</span>
+  </button>
+</div>
+
+<div class="footer-credit" id="footer-credit">برمجة / مصطفي القصبي</div>
+</div><!-- end .app -->
+
+<!-- ========== ADD EXPENSE MODAL ========== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ سجّل مصروف جديد</div>
+    <div class="modal-label">اسم المصروف</div>
+    <input type="text" class="modal-input" id="exp-name" placeholder="مثلاً: غداء كنتاكي">
+    <div class="modal-label">المبلغ بالجنيه</div>
+    <input type="number" class="modal-input" id="exp-amount" placeholder="0" oninput="updateWarning()" inputmode="numeric">
+    <div class="modal-label">الفئة</div>
+    <div class="categories">
+      <div class="cat-btn selected" data-cat="أكل" data-emoji="🍔" onclick="selectCat(this)"><div class="cat-emoji">🍔</div><div class="cat-name">أكل</div></div>
+      <div class="cat-btn" data-cat="مواصلات" data-emoji="🚗" onclick="selectCat(this)"><div class="cat-emoji">🚗</div><div class="cat-name">مواصلات</div></div>
+      <div class="cat-btn" data-cat="ملابس" data-emoji="👕" onclick="selectCat(this)"><div class="cat-emoji">👕</div><div class="cat-name">ملابس</div></div>
+      <div class="cat-btn" data-cat="ترفيه" data-emoji="🎮" onclick="selectCat(this)"><div class="cat-emoji">🎮</div><div class="cat-name">ترفيه</div></div>
+      <div class="cat-btn" data-cat="صحة" data-emoji="💊" onclick="selectCat(this)"><div class="cat-emoji">💊</div><div class="cat-name">صحة</div></div>
+      <div class="cat-btn" data-cat="تعليم" data-emoji="📚" onclick="selectCat(this)"><div class="cat-emoji">📚</div><div class="cat-name">تعليم</div></div>
+      <div class="cat-btn" data-cat="منزل" data-emoji="🏠" onclick="selectCat(this)"><div class="cat-emoji">🏠</div><div class="cat-name">منزل</div></div>
+      <div class="cat-btn" data-cat="متنوع" data-emoji="💫" onclick="selectCat(this)"><div class="cat-emoji">💫</div><div class="cat-name">متنوع</div></div>
+    </div>
+    <div class="warning-box" id="warning-box">
+      <div class="warning-hours" id="warning-hours">0 ساعة</div>
+      <div class="warning-text">من وقتك ⚠️ متأكد إنك عايز تصرف؟</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="btn-confirm" onclick="addExpense()">✓ سجّل</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SETTINGS MODAL ========== -->
+<div class="modal-overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ الإعدادات</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">البيانات الأساسية</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">المرتب الشهري</div>
+          <div class="settings-row-sub" id="set-salary-display">—</div>
+        </div>
+        <button onclick="promptEdit('salary')" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:6px 14px;color:var(--gold);font-family:Cairo,sans-serif;font-size:13px;cursor:pointer;">تعديل</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">ساعات العمل اليومية</div>
+          <div class="settings-row-sub" id="set-hours-display">—</div>
+        </div>
+        <button onclick="promptEdit('hours')" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:6px 14px;color:var(--gold);font-family:Cairo,sans-serif;font-size:13px;cursor:pointer;">تعديل</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">ميزانية اليوم</div>
+          <div class="settings-row-sub" id="set-budget-display">—</div>
+        </div>
+        <button onclick="promptEdit('budget')" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:6px 14px;color:var(--gold);font-family:Cairo,sans-serif;font-size:13px;cursor:pointer;">تعديل</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">معلوماتك</div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <div class="settings-row-label">ساعة شغلك = <span id="set-rate" style="color:var(--gold);font-weight:900;font-family:Tajawal,sans-serif;">0</span> جنيه</div>
+        <div class="settings-row-label">يوم شغلك الكامل = <span id="set-day-val" style="color:var(--gold);font-weight:900;font-family:Tajawal,sans-serif;">0</span> جنيه</div>
+      </div>
+    </div>
+
+    <button class="danger-btn" onclick="confirmReset()">🗑️ حذف كل البيانات والبدء من أول</button>
+    <div style="margin-top:16px;">
+      <button class="btn-cancel" style="width:100%;" onclick="closeSettings()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ========== GOAL ADD MODAL ========== -->
+<div class="modal-overlay" id="goal-modal-overlay" onclick="closeGoalModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💾 حفظ هدف جديد</div>
+    <div class="modal-label">اسم الهدف</div>
+    <input type="text" class="modal-input" id="gm-name" placeholder="مثلاً: موبايل جديد" id="gm-name">
+    <div class="modal-label">السعر المطلوب (جنيه)</div>
+    <input type="number" class="modal-input" id="gm-price" placeholder="0" inputmode="numeric">
+    <div class="modal-label">المبلغ اللي وفّرته لحد دلوقتي (جنيه)</div>
+    <input type="number" class="modal-input" id="gm-saved" placeholder="0" inputmode="numeric">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeGoalModal()">إلغاء</button>
+      <button class="btn-confirm" onclick="confirmSaveGoal()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== ZIKR ROTATION =====
+const zikrList = [
+  '🌙 اذكر الله ذكراً كثيراً • سبحان الله وبحمده',
+  '✨ سبحان الله • الحمد لله • لا إله إلا الله • الله أكبر',
+  '💫 اللهم بارك لنا في أوقاتنا وأرزاقنا',
+  '🤲 حسبنا الله ونعم الوكيل • لا حول ولا قوة إلا بالله',
+  '🕌 استغفر الله العظيم وأتوب إليه',
+  '🌟 اللهم إني أسألك العفو والعافية في الدنيا والآخرة',
+  '☀️ لا إله إلا الله وحده لا شريك له، له الملك وله الحمد',
+  '🌺 سبحان الله وبحمده، سبحان الله العظيم',
+];
+let zikrIndex = 0;
+function rotateZikr() {
+  zikrIndex = (zikrIndex + 1) % zikrList.length;
+  document.querySelectorAll('.zikr-text').forEach(el => {
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = zikrList[zikrIndex]; el.style.opacity = '1'; }, 400);
+  });
+}
+setInterval(rotateZikr, 8000);
+
+// ===== STATE =====
+let state = {
+  salary: 0, hoursPerDay: 8, hourlyRate: 0,
+  dailyBudget: 0, expenses: [], goals: [],
+  currentScreen: 'setup'
+};
+
+const saved = localStorage.getItem('waqti_v2');
+if (saved) {
+  try {
+    const loaded = JSON.parse(saved);
+    state = { ...state, ...loaded };
+    if (state.salary > 0) {
+      showScreen('main');
+      document.getElementById('bottom-nav').classList.add('show');
+      document.getElementById('footer-credit').classList.add('show');
+      updateMainScreen();
+    }
+  } catch(e) {}
+}
+
+function saveState() { localStorage.setItem('waqti_v2', JSON.stringify(state)); }
+
+// ===== SETUP =====
+let selectedHours = 8;
+function selectHours(h, btn) {
+  selectedHours = h;
+  document.querySelectorAll('.hour-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  calcRate();
+}
+function calcRate() {
+  const salary = parseFloat(document.getElementById('salary-input').value) || 0;
+  const rate = salary / (26 * selectedHours);
+  const rd = document.getElementById('rate-display');
+  if (salary > 0) {
+    rd.style.display = 'block';
+    document.getElementById('rate-value').textContent = rate.toFixed(1);
+  } else { rd.style.display = 'none'; }
+}
+function startApp() {
+  const salary = parseFloat(document.getElementById('salary-input').value);
+  const budget = parseFloat(document.getElementById('budget-input').value) || 0;
+  if (!salary || salary <= 0) { showToast('⚠️ من فضلك أدخل مرتبك الشهري'); return; }
+  state.salary = salary;
+  state.hoursPerDay = selectedHours;
+  state.hourlyRate = salary / (26 * selectedHours);
+  state.dailyBudget = budget;
+  saveState();
+  document.getElementById('bottom-nav').classList.add('show');
+  document.getElementById('footer-credit').classList.add('show');
+  showScreen('main');
+  updateMainScreen();
+  showToast('🎉 أهلاً! جاهز تتابع وقتك');
+}
+
+// ===== SCREENS =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name + '-screen').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  state.currentScreen = name;
+  if (name === 'weekly') updateWeeklyScreen();
+  if (name === 'goal') renderGoals();
+}
+
+// ===== ADD EXPENSE MODAL =====
+let selectedCat = 'أكل';
+let selectedCatEmoji = '🍔';
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('exp-name').value = '';
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('warning-box').classList.remove('show');
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector('[data-cat="أكل"]').classList.add('selected');
+  selectedCat = 'أكل'; selectedCatEmoji = '🍔';
+  setTimeout(() => document.getElementById('exp-name').focus(), 350);
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target.id === 'modal-overlay') closeModal(); }
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCat = btn.dataset.cat;
+  selectedCatEmoji = btn.dataset.emoji;
+  updateWarning();
+}
+function updateWarning() {
+  const amount = parseFloat(document.getElementById('exp-amount').value) || 0;
+  const hours = amount / state.hourlyRate;
+  const box = document.getElementById('warning-box');
+  if (amount > 0 && state.hourlyRate > 0) {
+    box.classList.add('show');
+    document.getElementById('warning-hours').textContent = hours.toFixed(1) + ' ساعة';
+  } else { box.classList.remove('show'); }
+}
+function addExpense() {
+  const name = document.getElementById('exp-name').value.trim();
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  if (!name) { showToast('⚠️ اكتب اسم المصروف'); return; }
+  if (!amount || amount <= 0) { showToast('⚠️ أدخل المبلغ'); return; }
+  const expense = {
+    id: Date.now(), name, amount, category: selectedCat,
+    emoji: selectedCatEmoji, hours: amount / state.hourlyRate,
+    time: new Date().toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }),
+    date: new Date().toLocaleDateString('ar-EG')
+  };
+  state.expenses.unshift(expense);
+  saveState();
+  closeModal();
+  updateMainScreen();
+  checkBudgetAlert(amount);
+  showToast('✅ تم تسجيل "' + name + '"');
+}
+
+// ===== MAIN SCREEN =====
+function updateMainScreen() {
+  const today = new Date().toLocaleDateString('ar-EG');
+  const todayExp = state.expenses.filter(e => e.date === today);
+  const totalMoney = todayExp.reduce((s,e) => s + e.amount, 0);
+  const totalHours = state.hourlyRate > 0 ? totalMoney / state.hourlyRate : 0;
+  const progress = state.hoursPerDay > 0 ? Math.min((totalHours / state.hoursPerDay) * 100, 100) : 0;
+
+  document.getElementById('today-hours').textContent = totalHours.toFixed(1);
+  document.getElementById('today-money').textContent = totalMoney.toFixed(0);
+  document.getElementById('work-hours-label').textContent = 'من ' + state.hoursPerDay + ' ساعات';
+  document.getElementById('progress-pct').textContent = progress.toFixed(0) + '% من يوم شغلك';
+
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = progress + '%';
+  bar.className = 'progress-bar ' + (progress < 50 ? 'low' : progress < 80 ? 'mid' : 'high');
+
+  document.getElementById('total-items').textContent = state.expenses.length;
+  document.getElementById('total-money').textContent = state.expenses.reduce((s,e) => s + e.amount, 0).toFixed(0);
+
+  // budget mini card
+  const bm = document.getElementById('budget-mini');
+  if (state.dailyBudget > 0) {
+    bm.classList.add('show');
+    const remain = state.dailyBudget - totalMoney;
+    const remEl = document.getElementById('bm-remain');
+    const subEl = document.getElementById('bm-sub');
+    document.getElementById('bm-budget').textContent = state.dailyBudget + ' ج';
+    remEl.textContent = Math.abs(remain).toFixed(0) + ' ج';
+    if (remain >= 0) {
+      remEl.className = 'bm-remain ' + (remain < state.dailyBudget * 0.2 ? 'low' : 'ok');
+      subEl.textContent = 'متبقي من ميزانيتك';
+    } else {
+      remEl.className = 'bm-remain over';
+      subEl.textContent = 'تجاوزت الميزانية! ⚠️';
+    }
+  } else { bm.classList.remove('show'); }
+
+  renderTransactions(todayExp);
+  updateBudgetAlert(totalMoney);
+}
+
+function updateBudgetAlert(totalMoney) {
+  const alert = document.getElementById('budget-alert');
+  if (state.dailyBudget <= 0) { alert.style.display = 'none'; return; }
+  const pct = (totalMoney / state.dailyBudget) * 100;
+  if (pct >= 100) {
+    alert.className = 'budget-alert danger';
+    document.getElementById('budget-alert-text').textContent = 'تجاوزت ميزانية اليوم! صرفت ' + totalMoney.toFixed(0) + ' من ' + state.dailyBudget + ' جنيه';
+  } else if (pct >= 75) {
+    alert.className = 'budget-alert warn';
+    document.getElementById('budget-alert-text').textContent = 'اقتربت من حد الميزانية! صرفت ' + pct.toFixed(0) + '%';
+  } else if (pct > 0) {
+    alert.className = 'budget-alert safe';
+    document.getElementById('budget-alert-text').textContent = '✓ كويس! صرفت ' + pct.toFixed(0) + '% من ميزانيتك';
+  } else { alert.style.display = 'none'; return; }
+}
+
+function checkBudgetAlert(newAmount) {
+  if (state.dailyBudget <= 0) return;
+  const today = new Date().toLocaleDateString('ar-EG');
+  const total = state.expenses.filter(e => e.date === today).reduce((s,e) => s + e.amount, 0);
+  if (total >= state.dailyBudget) showToast('🚨 تجاوزت ميزانية اليوم!');
+  else if (total >= state.dailyBudget * 0.75) showToast('⚠️ اقتربت من حد الميزانية');
+}
+
+function renderTransactions(todayExp) {
+  const list = document.getElementById('transactions-list');
+  const expenses = todayExp || state.expenses.slice(0, 20);
+  if (expenses.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-text">لسه مفيش مصاريف مسجّلة<br>ابدأ سجّل أول مصروف!</div></div>';
+    return;
+  }
+  list.innerHTML = expenses.map(e => `
+    <div class="transaction-item" id="item-${e.id}">
+      <div class="t-emoji">${e.emoji}</div>
+      <div class="t-info">
+        <div class="t-name">${e.name}</div>
+        <div class="t-time">${e.category} • ${e.time}</div>
+      </div>
+      <div class="t-values">
+        <div class="t-hours">${e.hours.toFixed(1)}س</div>
+        <div class="t-money">${e.amount.toFixed(0)} ج</div>
+      </div>
+      <button class="t-delete" onclick="deleteExpense(${e.id})">✕</button>
+    </div>`).join('');
+}
+
+function deleteExpense(id) {
+  state.expenses = state.expenses.filter(e => e.id !== id);
+  saveState(); updateMainScreen(); showToast('🗑️ تم الحذف');
+}
+function clearAll() {
+  if (state.expenses.length === 0) { showToast('مفيش مصاريف عشان تمسحها!'); return; }
+  if (confirm('هتمسح مصاريف النهارده فقط؟')) {
+    const today = new Date().toLocaleDateString('ar-EG');
+    state.expenses = state.expenses.filter(e => e.date !== today);
+    saveState(); updateMainScreen(); showToast('🗑️ تم مسح مصاريف النهارده');
+  }
+}
+
+// ===== GOAL SCREEN =====
+function calcGoal() {
+  const price = parseFloat(document.getElementById('goal-price').value) || 0;
+  if (price <= 0 || !state.hourlyRate) return;
+  const hours = price / state.hourlyRate;
+  const days = hours / state.hoursPerDay;
+  const weeks = days / 5;
+  document.getElementById('goal-result').classList.add('show');
+  document.getElementById('goal-days').textContent = days.toFixed(1);
+  document.getElementById('goal-label').textContent = days < 1 ? 'يوم شغل (أقل من يوم!)' : days < 2 ? 'يوم شغل بس!' : 'يوم شغل';
+  document.getElementById('goal-hours-val').textContent = hours.toFixed(1);
+  document.getElementById('goal-comparisons').innerHTML = `
+    <div class="compare-row"><span class="compare-label">⏰ ساعات شغل</span><span class="compare-val">${hours.toFixed(1)}</span></div>
+    <div class="compare-row"><span class="compare-label">📅 أيام شغل</span><span class="compare-val">${days.toFixed(1)}</span></div>
+    <div class="compare-row"><span class="compare-label">📆 أسابيع شغل</span><span class="compare-val">${weeks.toFixed(1)}</span></div>
+    <div class="compare-row"><span class="compare-label">💰 من مرتبك الشهري</span><span class="compare-val">${((price/state.salary)*100).toFixed(0)}%</span></div>`;
+}
+
+function saveGoal() {
+  const name = document.getElementById('goal-name').value.trim();
+  const price = parseFloat(document.getElementById('goal-price').value);
+  if (!name) { showToast('⚠️ اكتب اسم الهدف'); return; }
+  if (!price || price <= 0) { showToast('⚠️ أدخل سعر الهدف'); return; }
+  document.getElementById('gm-name').value = name;
+  document.getElementById('gm-price').value = price;
+  document.getElementById('gm-saved').value = '';
+  document.getElementById('goal-modal-overlay').classList.add('open');
+}
+function closeGoalModal() { document.getElementById('goal-modal-overlay').classList.remove('open'); }
+function closeGoalModalOutside(e) { if (e.target.id === 'goal-modal-overlay') closeGoalModal(); }
+function confirmSaveGoal() {
+  const name = document.getElementById('gm-name').value.trim();
+  const price = parseFloat(document.getElementById('gm-price').value) || 0;
+  const saved_amt = parseFloat(document.getElementById('gm-saved').value) || 0;
+  if (!name || price <= 0) { showToast('⚠️ بيانات ناقصة'); return; }
+  state.goals.push({ id: Date.now(), name, price, saved: saved_amt });
+  saveState(); closeGoalModal(); renderGoals();
+  showToast('✅ تم حفظ الهدف "' + name + '"');
+}
+function renderGoals() {
+  const list = document.getElementById('goals-list');
+  if (!state.goals || state.goals.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0;">لسه مفيش أهداف محفوظة</div>';
+    return;
+  }
+  list.innerHTML = state.goals.map(g => {
+    const pct = Math.min((g.saved / g.price) * 100, 100);
+    const remain = Math.max(g.price - g.saved, 0);
+    const daysLeft = state.hourlyRate > 0 ? remain / (state.hourlyRate * state.hoursPerDay) : 0;
+    return `
+    <div class="goal-item">
+      <div class="goal-item-top">
+        <div class="goal-item-name">${g.name}</div>
+        <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
+      </div>
+      <div class="goal-item-prog"><div class="goal-item-bar" style="width:${pct}%"></div></div>
+      <div class="goal-item-pct">
+        <span>${pct.toFixed(0)}% (${g.saved.toFixed(0)} / ${g.price.toFixed(0)} ج)</span>
+        <span>${daysLeft.toFixed(1)} يوم متبقي</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deleteGoal(id) {
+  state.goals = state.goals.filter(g => g.id !== id);
+  saveState(); renderGoals(); showToast('🗑️ تم حذف الهدف');
+}
+
+// ===== ANALYSIS SCREEN =====
+function updateWeeklyScreen() {
+  const catData = {};
+  state.expenses.forEach(e => {
+    if (!catData[e.category]) catData[e.category] = { money:0, hours:0, emoji:e.emoji };
+    catData[e.category].money += e.amount;
+    catData[e.category].hours += e.hours;
+  });
+  const entries = Object.entries(catData).sort((a,b) => b[1].money - a[1].money);
+  const maxMoney = entries.length ? Math.max(...entries.map(e => e[1].money)) : 1;
+  const totalMoney = state.expenses.reduce((s,e) => s + e.amount, 0);
+  const totalHours = state.hourlyRate > 0 ? totalMoney / state.hourlyRate : 0;
+
+  // Chart
+  const cb = document.getElementById('chart-bars');
+  if (entries.length === 0) {
+    cb.innerHTML = '<div style="color:var(--text-muted);font-size:13px;margin:auto;">لسه مفيش بيانات</div>';
+  } else {
+    cb.innerHTML = entries.slice(0,7).map(([cat,d]) => {
+      const pct = (d.money / maxMoney) * 100;
+      return `<div class="chart-bar-wrap">
+        <div class="chart-bar-val">${d.hours.toFixed(0)}س</div>
+        <div class="chart-bar" style="height:${Math.max(pct,4)}%"></div>
+        <div class="chart-bar-day">${d.emoji}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Insight rows
+  const ir = document.getElementById('insight-rows');
+  if (entries.length === 0) {
+    ir.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">سجّل مصاريف عشان تشوف التحليل</div>';
+  } else {
+    ir.innerHTML = entries.map(([cat,d]) => `
+      <div class="insight-row">
+        <div class="insight-left">
+          <div class="insight-emoji">${d.emoji}</div>
+          <div><div class="insight-name">${cat}</div><div class="insight-sub">${((d.money/totalMoney)*100).toFixed(0)}% من الإجمالي</div></div>
+        </div>
+        <div class="insight-right">
+          <div class="insight-hours">${d.hours.toFixed(1)}س</div>
+          <div class="insight-money">${d.money.toFixed(0)} ج</div>
+        </div>
+      </div>`).join('') +
+      `<div class="total-row"><span class="total-label">الإجمالي الكلي</span><span class="total-val">${totalHours.toFixed(1)}س = ${totalMoney.toFixed(0)} ج</span></div>`;
+  }
+
+  // Smart tip
+  const tipCard = document.getElementById('smart-tip');
+  if (entries.length > 0) {
+    tipCard.style.display = 'block';
+    const top = entries[0];
+    const topPct = ((top[1].money / totalMoney) * 100).toFixed(0);
+    let tip = '';
+    if (top[0] === 'أكل') tip = `بتصرف ${topPct}% من مصاريفك على الأكل. حاول تطبخ في البيت يومين في الأسبوع وهتوفر على الأقل 20-30%.`;
+    else if (top[0] === 'مواصلات') tip = `المواصلات أخدت ${topPct}% من مصاريفك. فكّر في كاربول مع زملاء أو استخدام المواصلات العامة أيام معينة.`;
+    else if (top[0] === 'ترفيه') tip = `الترفيه أخد ${topPct}% من مصاريفك. الترفيه ضروري لكن حدد ليك ميزانية ثابتة عشان متتجاوزش.`;
+    else if (top[0] === 'ملابس') tip = `الملابس أخدت ${topPct}% من مصاريفك. انتظر التخفيضات وضع قائمة باحتياجاتك قبل الشراء.`;
+    else tip = `أكتر فئة صرف عندك هي "${top[0]}" بنسبة ${topPct}%. راجع مصاريفك فيها وشوف لو في حاجة ممكن تقللها.`;
+    document.getElementById('smart-tip-text').textContent = tip;
+  } else { tipCard.style.display = 'none'; }
+}
+
+// ===== SETTINGS =====
+function openSettings() {
+  document.getElementById('set-salary-display').textContent = state.salary + ' جنيه شهرياً';
+  document.getElementById('set-hours-display').textContent = state.hoursPerDay + ' ساعة يومياً';
+  document.getElementById('set-budget-display').textContent = state.dailyBudget > 0 ? state.dailyBudget + ' جنيه / يوم' : 'غير محدد';
+  document.getElementById('set-rate').textContent = state.hourlyRate.toFixed(1);
+  document.getElementById('set-day-val').textContent = (state.hourlyRate * state.hoursPerDay).toFixed(0);
+  document.getElementById('settings-overlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+function closeSettingsOutside(e) { if (e.target.id === 'settings-overlay') closeSettings(); }
+function promptEdit(field) {
+  if (field === 'salary') {
+    const v = prompt('أدخل المرتب الجديد (جنيه):', state.salary);
+    if (v && parseFloat(v) > 0) { state.salary = parseFloat(v); state.hourlyRate = state.salary / (26 * state.hoursPerDay); saveState(); openSettings(); updateMainScreen(); showToast('✅ تم تحديث المرتب'); }
+  } else if (field === 'hours') {
+    const v = prompt('أدخل ساعات العمل اليومية:', state.hoursPerDay);
+    if (v && parseFloat(v) > 0) { state.hoursPerDay = parseFloat(v); state.hourlyRate = state.salary / (26 * state.hoursPerDay); saveState(); openSettings(); updateMainScreen(); showToast('✅ تم التحديث'); }
+  } else if (field === 'budget') {
+    const v = prompt('أدخل الميزانية اليومية (0 = بدون):', state.dailyBudget);
+    if (v !== null) { state.dailyBudget = parseFloat(v) || 0; saveState(); openSettings(); updateMainScreen(); showToast('✅ تم تحديث الميزانية'); }
+  }
+}
+function confirmReset() {
+  if (confirm('متأكد إنك عايز تمسح كل البيانات وتبدأ من الأول؟')) {
+    localStorage.removeItem('waqti_v2'); location.reload();
+  }
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
