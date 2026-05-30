@@ -1,2 +1,1 @@
-# waqti
-تطبيق وقتي
+index.html
